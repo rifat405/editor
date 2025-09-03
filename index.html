@@ -69,21 +69,16 @@
         }
         
         button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+            transform: none;
+            opacity: 0.9;
         }
         
         button:active {
-            transform: translateY(0);
+            transform: scale(0.98);
         }
         
         .clear-btn {
             background: linear-gradient(45deg, #ff6b6b, #ee5a24);
-            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
-        }
-        
-        .clear-btn:hover {
-            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.6);
         }
         
         input[type="file"] {
@@ -92,54 +87,58 @@
         
         .table-container {
             overflow: auto;
-            max-height: 70vh;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            max-height: calc(100vh - 80px);
+            border-radius: 6px;
+            border: 1px solid #e0e6ed;
             background: white;
         }
         
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 14px;
+            font-size: 10px;
         }
         
         th {
             background: linear-gradient(45deg, #667eea, #764ba2);
             color: white;
-            padding: 15px 10px;
+            padding: 4px 2px;
             text-align: center;
-            font-weight: 600;
+            font-weight: 500;
             position: sticky;
             top: 0;
             z-index: 10;
+            font-size: 9px;
         }
         
         td {
-            border: 2px solid #e0e6ed;
-            padding: 8px;
+            border: 1px solid #e0e6ed;
+            padding: 2px;
             text-align: center;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: background 0.1s ease;
             background: white;
-            position: relative;
+            font-size: 9px;
+            max-width: 60px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
         
         td:hover {
-            background: linear-gradient(45deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
-            transform: scale(1.02);
+            background: rgba(102, 126, 234, 0.1);
         }
         
         .row-number {
-            background: linear-gradient(45deg, #f8f9fa, #e9ecef);
-            font-weight: 600;
+            background: #f8f9fa;
+            font-weight: 500;
             color: #666;
             cursor: default !important;
+            font-size: 8px;
         }
         
         .row-number:hover {
-            background: linear-gradient(45deg, #f8f9fa, #e9ecef) !important;
-            transform: none !important;
+            background: #f8f9fa !important;
         }
         
         .column-a {
@@ -149,7 +148,7 @@
         .column-b {
             background: rgba(76, 175, 80, 0.1);
             color: #2e7d32;
-            font-weight: 600;
+            font-weight: 500;
         }
         
         .column-c {
@@ -157,58 +156,66 @@
         }
         
         .status {
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 10px;
+            margin-top: 4px;
+            padding: 4px;
+            border-radius: 4px;
             text-align: center;
-            font-weight: 600;
+            font-weight: 500;
+            font-size: 9px;
             display: none;
         }
         
         .status.success {
             background: rgba(76, 175, 80, 0.1);
             color: #2e7d32;
-            border: 2px solid rgba(76, 175, 80, 0.3);
+            border: 1px solid rgba(76, 175, 80, 0.3);
         }
         
         .status.error {
             background: rgba(244, 67, 54, 0.1);
             color: #c62828;
-            border: 2px solid rgba(244, 67, 54, 0.3);
+            border: 1px solid rgba(244, 67, 54, 0.3);
         }
         
         .data-count {
-            margin-top: 15px;
+            margin-top: 4px;
             text-align: center;
-            font-size: 14px;
+            font-size: 8px;
             color: #666;
-            font-weight: 600;
+            font-weight: 500;
         }
         
-        @media (max-width: 768px) {
+        @media (max-width: 300px) {
             .container {
-                padding: 15px;
-            }
-            
-            .header h1 {
-                font-size: 2em;
+                padding: 4px;
             }
             
             .controls {
                 flex-direction: column;
                 align-items: center;
+                gap: 2px;
             }
             
             button {
-                width: 200px;
+                width: 100%;
+                font-size: 9px;
+                padding: 3px 6px;
             }
             
             table {
-                font-size: 12px;
+                font-size: 8px;
             }
             
             th, td {
-                padding: 6px 4px;
+                padding: 1px;
+            }
+            
+            th {
+                font-size: 8px;
+            }
+            
+            td {
+                font-size: 8px;
             }
         }
     </style>
@@ -221,23 +228,23 @@
         </div>
         
         <div class="controls">
-            <button onclick="copyColumnA()">📋 Copy Column A Data</button>
+            <button onclick="copyColumnA()">📋 Copy A</button>
             <button onclick="exportData()">📤 Export</button>
             <label for="importFile">
                 <button type="button" onclick="document.getElementById('importFile').click()">📥 Import</button>
             </label>
             <input type="file" id="importFile" accept=".xlsx,.xls" onchange="importData(event)">
-            <button class="clear-btn" onclick="clearAllData()">🗑️ Clear All Data</button>
+            <button class="clear-btn" onclick="clearAllData()">🗑️ Clear</button>
         </div>
         
         <div class="table-container">
             <table id="dataTable">
                 <thead>
                     <tr>
-                        <th style="width: 60px;">#</th>
-                        <th style="width: 40%;">Column A</th>
-                        <th style="width: 30%;">Column B</th>
-                        <th style="width: 30%;">Column C</th>
+                        <th style="width: 20px;">#</th>
+                        <th style="width: 35%;">A</th>
+                        <th style="width: 32%;">B</th>
+                        <th style="width: 33%;">C</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody">
@@ -403,36 +410,65 @@
             }
         }
         
-        // Export data
+        // Export data - iframe compatible
         function exportData() {
-            const ws_data = [];
-            // No headers - only data
-            
-            for (let row = 1; row <= TOTAL_ROWS; row++) {
-                if (sheetData[row] && (sheetData[row].A || sheetData[row].B || sheetData[row].C)) {
-                    ws_data.push([
-                        sheetData[row].A || '',
-                        sheetData[row].B || '',
-                        sheetData[row].C || ''
-                    ]);
+            try {
+                const ws_data = [];
+                // No headers - only data
+                
+                for (let row = 1; row <= TOTAL_ROWS; row++) {
+                    if (sheetData[row] && (sheetData[row].A || sheetData[row].B || sheetData[row].C)) {
+                        ws_data.push([
+                            sheetData[row].A || '',
+                            sheetData[row].B || '',
+                            sheetData[row].C || ''
+                        ]);
+                    }
                 }
+                
+                if (ws_data.length === 0) {
+                    showStatus('❌ No data to export', 'error');
+                    return;
+                }
+
+                // Try direct download first
+                try {
+                    const ws = XLSX.utils.aoa_to_sheet(ws_data);
+                    const wb = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+                    
+                    // Generate filename with current date
+                    const today = new Date();
+                    const filename = `data_${today.getFullYear()}-${(today.getMonth()+1).toString().padStart(2,'0')}-${today.getDate().toString().padStart(2,'0')}.xlsx`;
+                    
+                    XLSX.writeFile(wb, filename);
+                    showStatus('✅ Data exported successfully!', 'success');
+                } catch (downloadError) {
+                    // Fallback: Create downloadable link
+                    const ws = XLSX.utils.aoa_to_sheet(ws_data);
+                    const wb = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+                    
+                    const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+                    const blob = new Blob([wbout], { type: 'application/octet-stream' });
+                    const url = URL.createObjectURL(blob);
+                    
+                    // Create temporary download link
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'exported_data.xlsx';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    
+                    showStatus('✅ Data exported successfully!', 'success');
+                }
+                
+            } catch (error) {
+                console.error('Export error:', error);
+                showStatus('❌ Export failed. Browser restrictions.', 'error');
             }
-            
-            if (ws_data.length === 0) {
-                showStatus('❌ No data to export', 'error');
-                return;
-            }
-            
-            const ws = XLSX.utils.aoa_to_sheet(ws_data);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
-            
-            // Generate filename with current date
-            const today = new Date();
-            const filename = `data_${today.getFullYear()}-${(today.getMonth()+1).toString().padStart(2,'0')}-${today.getDate().toString().padStart(2,'0')}.xlsx`;
-            
-            XLSX.writeFile(wb, filename);
-            showStatus('✅ Data exported successfully!', 'success');
         }
         
         // Import data
