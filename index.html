@@ -410,65 +410,40 @@
             }
         }
         
-        // Export data - iframe compatible
+        // Export data - simple iframe method
         function exportData() {
-            try {
-                const ws_data = [];
-                // No headers - only data
-                
-                for (let row = 1; row <= TOTAL_ROWS; row++) {
-                    if (sheetData[row] && (sheetData[row].A || sheetData[row].B || sheetData[row].C)) {
-                        ws_data.push([
-                            sheetData[row].A || '',
-                            sheetData[row].B || '',
-                            sheetData[row].C || ''
-                        ]);
-                    }
+            const ws_data = [];
+            
+            for (let row = 1; row <= TOTAL_ROWS; row++) {
+                if (sheetData[row] && (sheetData[row].A || sheetData[row].B || sheetData[row].C)) {
+                    ws_data.push([
+                        sheetData[row].A || '',
+                        sheetData[row].B || '',
+                        sheetData[row].C || ''
+                    ]);
                 }
-                
-                if (ws_data.length === 0) {
-                    showStatus('❌ No data to export', 'error');
-                    return;
-                }
-
-                // Try direct download first
-                try {
-                    const ws = XLSX.utils.aoa_to_sheet(ws_data);
-                    const wb = XLSX.utils.book_new();
-                    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
-                    
-                    // Generate filename with current date
-                    const today = new Date();
-                    const filename = `data_${today.getFullYear()}-${(today.getMonth()+1).toString().padStart(2,'0')}-${today.getDate().toString().padStart(2,'0')}.xlsx`;
-                    
-                    XLSX.writeFile(wb, filename);
-                    showStatus('✅ Data exported successfully!', 'success');
-                } catch (downloadError) {
-                    // Fallback: Create downloadable link
-                    const ws = XLSX.utils.aoa_to_sheet(ws_data);
-                    const wb = XLSX.utils.book_new();
-                    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
-                    
-                    const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-                    const blob = new Blob([wbout], { type: 'application/octet-stream' });
-                    const url = URL.createObjectURL(blob);
-                    
-                    // Create temporary download link
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = 'exported_data.xlsx';
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
-                    
-                    showStatus('✅ Data exported successfully!', 'success');
-                }
-                
-            } catch (error) {
-                console.error('Export error:', error);
-                showStatus('❌ Export failed. Browser restrictions.', 'error');
             }
+            
+            if (ws_data.length === 0) {
+                showStatus('❌ No data to export', 'error');
+                return;
+            }
+
+            // Simple CSV export that always works
+            const csvContent = ws_data.map(row => row.join(',')).join('\n');
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'data.csv';
+            a.style.display = 'none';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showStatus('✅ Data exported as CSV!', 'success');
         }
         
         // Import data
@@ -517,14 +492,24 @@
             event.target.value = ''; // Reset file input
         }
         
-        // Clear all data
+        // Clear all data - no confirmation
         function clearAllData() {
-            if (confirm('আপনি কি সত্যিই সব ডেটা মুছে ফেলতে চান?')) {
-                sheetData = {};
-                window.savedSheetData = null;
-                initializeTable();
-                showStatus('✅ All data cleared!', 'success');
+            sheetData = {};
+            window.savedSheetData = null;
+            
+            // Clear all cells manually
+            for (let row = 1; row <= TOTAL_ROWS; row++) {
+                const cellA = document.querySelector(`td[data-row="${row}"][data-col="A"]`);
+                const cellB = document.querySelector(`td[data-row="${row}"][data-col="B"]`);
+                const cellC = document.querySelector(`td[data-row="${row}"][data-col="C"]`);
+                
+                if (cellA) cellA.textContent = '';
+                if (cellB) cellB.textContent = '';
+                if (cellC) cellC.textContent = '';
             }
+            
+            updateDataCount();
+            showStatus('✅ All data cleared!', 'success');
         }
         
         // Show status message
@@ -539,19 +524,42 @@
             }, 3000);
         }
         
-        // Initialize on page load
+        // Initialize on page load - iframe compatible
         document.addEventListener('DOMContentLoaded', function() {
-            initializeTable();
-            showStatus('🚀 XLSX Editor loaded successfully!', 'success');
+            try {
+                initializeTable();
+                
+                // Check if running in iframe
+                const isInIframe = window.self !== window.top;
+                if (isInIframe) {
+                    showStatus('🔧 Iframe mode - some features may have limitations', 'success');
+                } else {
+                    showStatus('🚀 XLSX Editor loaded successfully!', 'success');
+                }
+            } catch (error) {
+                console.error('Initialization error:', error);
+                initializeTable();
+                showStatus('⚠️ Loaded with limited features', 'error');
+            }
         });
         
-        // Handle page unload to save data
-        window.addEventListener('beforeunload', function() {
-            saveDataToMemory();
-        });
+        // Handle page unload to save data - iframe compatible
+        try {
+            window.addEventListener('beforeunload', function() {
+                saveDataToMemory();
+            });
+        } catch (error) {
+            console.log('Beforeunload not available in iframe');
+        }
         
-        // Auto-save every 30 seconds
-        setInterval(saveDataToMemory, 30000);
+        // Auto-save every 30 seconds - always works
+        setInterval(function() {
+            try {
+                saveDataToMemory();
+            } catch (error) {
+                console.log('Auto-save error:', error);
+            }
+        }, 30000);
     </script>
 </body>
 </html>
